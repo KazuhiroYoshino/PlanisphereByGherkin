@@ -137,6 +137,10 @@ public class StepDefinitions {
     }
 
 /** ドロップダウンメニュー */
+    @もし("ドロップダウン「([^\"]*)」から「([^\\\"]*)」を選択する$")
+    public void dropDown_select(String dropDown, String selText) throws InterruptedException {
+    	connector.dropDownSelect(dropDown, selText);;
+    }
 
 
 /** スクリーンショット */

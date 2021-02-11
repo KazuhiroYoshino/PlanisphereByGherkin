@@ -24,6 +24,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import cucumber.api.java.Before;
@@ -444,7 +445,19 @@ public class WebConnector {
         Thread.sleep(500);
     }
 
-/**  ドロップダウンメニューから選択する */
+/**  ドロップダウンメニューから選択する
+ * @throws InterruptedException */
+    public void dropDownSelect(String commandLocater, String selText) throws InterruptedException {
+		WebElement element = this.driver.findElement(By.id(commandLocater));
+		Actions actions = new Actions(this.driver);
+		actions.moveToElement(element);
+		actions.perform();
+		Thread.sleep(1000);
+        Select output_Select = new Select(this.driver.findElement(By.id(commandLocater)));
+        output_Select.selectByVisibleText(selText);
+        Thread.sleep(500);
+
+    }
 
 
     public void assertTable(String className, List expect) {
