@@ -8,21 +8,12 @@ import cucumber.api.java.ja.もし;
 import cucumber.api.java.ja.前提;
 
 public class StepDefinitions {
-    /** Web ドライバー接続クラス */
-    private WebConnector connector;
+    private WebConnector connector = new WebConnector();
 
-    public void WebSteps(WebConnector connector) {
-        this.connector = connector;
-    }
 
-    /**
-     * スクリーンショットのファイル格納フォルダを指定する
-     * @param path　ファイル格納フォルダ名
-     */
-    @前提("^スクリーンショット保管場所「([^\"]*)」$")
-    public void screenshot_folder(String path) {
-        connector.setScreenShotPath(path);
-    }
+//    public void WebSteps(WebConnector connector) {
+//        this.connector = connector;
+//    }
 
     /**
      * 使用するWebドライバを指定する
@@ -31,14 +22,10 @@ public class StepDefinitions {
      * 　　ただし、Edge はまともに動きません
      * @throws InterruptedException
      */
-    @前提("^Webドライバ「([^\"]*)」を選択する$")
+	@前提("^Webドライバは\"([^\"]*)\"を選択する$")
     public void select_webdriver(String browserType) throws InterruptedException {
-        connector.selectWebDriver(browserType);
-    }
-
-    @ならば("Windowを最大化する$")
-    public void window_maximized() throws InterruptedException {
-        connector.setWindowMax();
+//		System.out.println(browserType);
+		connector.selectWebDriver(browserType);
     }
 
     /**
@@ -46,16 +33,27 @@ public class StepDefinitions {
      * @param url　表示するURL
      * @throws InterruptedException
      */
-    @前提("^ページ「([^\"]*)」を表示する$")
+    @前提("^ページ\"([^\"]*)\"を表示する$")
     public void display_url(String url) throws InterruptedException {
         connector.openAndWait(url);
     }
 
+    @もし("Windowを最大化する$")
+    public void window_maximized() throws InterruptedException {
+        connector.setWindowMax();
+    }
+
+/**　待機 */
+    @ならば("^\"([^\"]*)\"秒待つ$")
+    public void wait(int sec) {
+        connector.sleep(sec);
+    }
+
     /**
-     * 表示結果のチェック
+* 表示結果のチェック
      * @param pattern 検索するテキスト
      */
-    @もし("画面に「([^\"]*)」と表示されていること$")
+    @ならば("画面に\"([^\"]*)\"と表示されていること$")
     public void search_text(String pattern) {
         assertTrue(connector.isTextPresent(pattern));
     }
@@ -65,17 +63,14 @@ public class StepDefinitions {
      * spanタグセレクタのクリックイベント
      * @param text spanタグで括られたテキストを指定する
      */
-    @もし("ラベル「([^\"]*)」をクリックする$")
+    @もし("ラベル\"([^\"]*)\"をクリックする$")
     public void span_click(String text) {
         connector.spanClickAndWait("span", text);
     }
 
-    /**
-     * aタグセレクタのクリックイベント
-     * @param text aタグで括られたテキストを指定する
-     */
-    @もし("リンクテキスト「([^\"]*)」をクリックする$")
-    public void link_click(String text) {
+    @もし("リンクテキスト\"([^\"]*)\"をクリックする$")
+    public void link_click(String text) throws InterruptedException {
+//		System.out.println(text);
         connector.linkClickAndWait(text);
     }
 
@@ -83,7 +78,7 @@ public class StepDefinitions {
      * aタグセレクタのクリックイベント
      * @param href aタグの アンカー(href)を指定する
      */
-    @もし("アンカー「([^\"]*)」をクリックする$")
+    @もし("アンカー\"([^\"]*)\"をクリックする$")
     public void anchor_click(String href) {
         connector.clickHrefAndWait(href);
     }
@@ -92,7 +87,7 @@ public class StepDefinitions {
      * input type="button"タグセレクタのクリックイベント
      * @param name ボタンのテキスト(value)を指定する
      */
-    @もし("ボタン「([^\"]*)」をクリックする$")
+    @もし("ボタン\"([^\"]*)\"をクリックする$")
     public void button_click(String name) {
         connector.btnClickAndWait(name);
     }
@@ -101,7 +96,7 @@ public class StepDefinitions {
      * input type="button"タグセレクタのクリックイベント
      * @param name ボタンのテキスト(value)を指定する
      */
-    @かつ("かつボタン「([^\"]*)」をクリックする$")
+    @かつ("かつボタン\"([^\"]*)\"をクリックする$")
     public void and_button_click(String name) {
         connector.btnClickAndWait(name);
     }
@@ -112,7 +107,7 @@ public class StepDefinitions {
      * @param name ボタンのテキスト(value)を指定する
      * @param type ボタンのタイプ(button or submitを期待)を指定する
      */
-    @もし("名前が「([^\"]*)」のボタン「([^\"]*)」をクリックする$")
+    @もし("名前が\"([^\"]*)\"のボタン\"([^\"]*)\"をクリックする$")
     public void something_button_click(String name, String type) {
         connector.btnClickAndWait(type, name);
     }
@@ -124,38 +119,38 @@ public class StepDefinitions {
      * @param type ボタンのタイプ(button or submitを期待)を指定する
      * @param index ボタンの配列の順番を指定する(1 origin)
      */
-    @もし("名前が「([^\"]*)」の「([^\"]*)」番目のボタンをクリックする$")
+    @もし("名前が\"([^\"]*)\"の\"([^\"]*)\"番目のボタンをクリックする$")
     public void index_button_click(String value, String type, int index ) {
         connector.btnByblockClickAndWait(type, value, index-1);
     }
 
 /** チェックボックスのクリックイベント
  * @throws InterruptedException */
-    @もし("チェックボックス「([^\"]*)」をクリックする$")
+    @もし("チェックボックス\"([^\"]*)\"をクリックする$")
     public void checkBox_click(String check) throws InterruptedException {
     	connector.checkBoxClick(check);
     }
 
 /** ドロップダウンメニュー */
-    @もし("ドロップダウン「([^\"]*)」から「([^\\\"]*)」を選択する$")
+    @もし("ドロップダウン\"([^\"]*)\"から\"([^\"]*)\"を選択する$")
     public void dropDown_select(String dropDown, String selText) throws InterruptedException {
     	connector.dropDownSelect(dropDown, selText);;
     }
 
 
 /** スクリーンショット */
-    @ならば("ファイル名「([^\"]*)」でスクリーンショットを保存する$")
-    public void screen_shot(String filename) {
-        connector.getScreenShot(filename);
-    }
+//    @ならば("ファイル名「([^\"]*)」でスクリーンショットを保存する$")
+//    public void screen_shot(String filename) {
+//        connector.getScreenShot(filename);
+//    }
 
-    @もし("画面に「([^\"]*)」と表示されていなければ、ファイル名「([^\"]*)」でスクリーンショットを保存する$")
-    public void not_indicated_check(String pattern, String filename) {
-        if(!connector.isTextPresent(pattern)) {
-            connector.getScreenShot(filename);
-            connector.destroySelenium();
-        }
-    }
+//    @もし("画面に「([^\"]*)」と表示されていなければ、ファイル名「([^\"]*)」でスクリーンショットを保存する$")
+//    public void not_indicated_check(String pattern, String filename) {
+//        if(!connector.isTextPresent(pattern)) {
+//            connector.getScreenShot(filename);
+//            connector.destroySelenium();
+//        }
+//    }
 
 /** 入力系 */
     /**
@@ -163,7 +158,7 @@ public class StepDefinitions {
      * @param selector id or name セレクタ名
      * @param val 入力する値
      */
-    @もし("「([^\"]*)」要素に「([^\"]*)」と入力する$")
+    @もし("\"([^\"]*)\"要素に\"([^\"]*)\"と入力する$")
     public void input_element(String selector, String val) {
         connector.inputAndWait(selector,val);
     }
@@ -172,7 +167,7 @@ public class StepDefinitions {
      * 入力要素に Enter キーを入力する
      * @param selector id or name セレクタ名
      */
-    @もし("「([^\"]*)」要素にEnterを入力する$")
+    @もし("\"([^\"]*)\"要素にEnterを入力する$")
     public void input_enter_element(String selector) {
         connector.inputEnterAndWait(selector);
     }
@@ -181,7 +176,7 @@ public class StepDefinitions {
      * 入力要素に Enter キーを入力する
      * @param selector id or name セレクタ名
      */
-     @かつ("かつ「([^\"]*)」要素にEnterを入力する$")
+     @かつ("かつ\"([^\"]*)\"要素にEnterを入力する$")
     public void and_enter_element(String selector) {
         connector.inputEnterAndWait(selector);
     }
@@ -191,34 +186,14 @@ public class StepDefinitions {
      * @param selector id or name セレクタ名
      * @param val 入力する値
      */
-    @かつ("かつ「([^\"]*)」要素に「([^\"]*)」と入力する$")
+    @かつ("かつ\"([^\"]*)\"要素に\"([^\"]*)\"と入力する$")
     public void and_input_element(String selector, String val) {
         connector.inputAndWait(selector,val);
     }
 
-    /**　待機 */
-    @ならば("^「([^\"]*)」秒待つ$")
-    public void wait(int sec) {
-        connector.sleep(sec);
-    }
-
-    /**
-     * iFrameのIDセレクタを指定する事
-
-    @ならば("^フレームが表示されるまで待つ$")
-    public void wait_frame() {
-        connector.sleepFrame("main_frame", "cf_title2");
-    }
-    */
-
-    @ならば("^親Windowに戻る$")
-    public void back2parent() {
-        connector.parentWindow();
-    }
 
     @もし("シナリオを終了してブラウザを閉じる$")
     public void close() {
         connector.destroySelenium();
     }
-
 }

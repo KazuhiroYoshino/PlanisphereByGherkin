@@ -3,18 +3,13 @@ package planisphereTest.PlanisphereTestByCucumber;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -27,10 +22,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import cucumber.api.java.Before;
-
 public class WebConnector {
-    private final static long DEFAULT_TIMEOUT = 5000;
+//    private final static long DEFAULT_TIMEOUT = 5000;
 
     // ブラウザ名
     private final String BROWSER_IE = "IE";
@@ -46,21 +39,22 @@ public class WebConnector {
     private final int BROWSER_TYPE_CR = 4;
 
     /** WebDriverクラス */
-    private WebDriver driver = null;
+    public static WebDriver driver;
 
     /** 実行中のWebDriverタイプを保持する */
     private int DriverType;
     /** Screen Shot FolderName */
     private String screenShotPath = null;
     private Actions builder = null;
+
     /**
      * コンストラクタ
      */
-    public WebConnector() {}
+//    public WebConnector() {}
 
-	Date dt;
-	String testDate;
-    WebDriverWait wait;
+	public Date dt;
+	public String testDate;
+    public static WebDriverWait wait;
 
     /**
      * WebDriverの選択
@@ -92,31 +86,31 @@ public class WebConnector {
             //Windows10では、 64bit 版だと動かないので32bitを使う
             System.setProperty("webdriver.ie.driver", "./exe32bit/IEDriverServer.exe");
 
-            this.driver = new InternetExplorerDriver();
+            driver = new InternetExplorerDriver();
             break;
 
         case BROWSER_TYPE_EDGE: // Edge
-            System.setProperty("webdriver.edge.driver", "C:\\\\WebDrivers\\\\edgedriver_win64\\\\msedgedriver.exe");
+            System.setProperty("webdriver.edge.driver", "C:\\WebDrivers\\edgedriver_win64\\msedgedriver.exe");
 
-            this.driver = new EdgeDriver();
+            driver = new EdgeDriver();
             break;
 
         case BROWSER_TYPE_FF: // FireFox
-            System.setProperty("webdriver.gecko.driver", "C:\\\\WebDrivers\\\\geckodriver_win64\\\\geckodriver.exe");
-            this.driver = new FirefoxDriver();
+            System.setProperty("webdriver.gecko.driver", "C:\\WebDrivers\\geckodriver_win64\\geckodriver.exe");
+            driver = new FirefoxDriver();
             break;
 
         case BROWSER_TYPE_OPERA: // Opera
             System.setProperty("webdriver.opera.driver", "./exe64bit/operadriver.exe");
-            this.driver = new OperaDriver();
+            driver = new OperaDriver();
             break;
 
         default: // Chrome
-            System.setProperty("webdriver.chrome.driver", "C:\\\\WebDrivers\\\\chromedriver_win32\\\\chromedriver.exe");
-            this.driver = new ChromeDriver();
+            System.setProperty("webdriver.chrome.driver", "C:\\WebDrivers\\chromedriver_win32\\chromedriver.exe");
+            driver = new ChromeDriver();
             break;
         }
-        this.builder =  new Actions(this.driver);
+//        this.builder =  new Actions(this.driver);
         Thread.sleep(3000);
         //暗黙wait
         //this.driver.manage().timeouts().implicitlyWait(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -124,6 +118,8 @@ public class WebConnector {
 		dt = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		testDate = sdf.format(dt);
+
+        wait = new WebDriverWait(driver, 10);
 
     }
 
@@ -134,7 +130,7 @@ public class WebConnector {
      */
     public void openAndWait(String location) throws InterruptedException {
         //location(URL)のタイプミスとかでもエラーにはならない
-        this.driver.navigate().to(location);
+        driver.navigate().to(location);
         Thread.sleep(5000);
     }
 
@@ -146,14 +142,11 @@ public class WebConnector {
      */
     public void setWindowMax() throws InterruptedException {
         //ただし、Chromeではorg.openqa.selenium.NoSuchSessionExceptionで動かない）
-        if(this.DriverType != BROWSER_TYPE_CR) {
-            //Chrome ドライバ以外では、最大化する ⇒ Chrome はドライバインスタンス生成時に最大化オプション指定
             try {
-                this.driver.manage().window().maximize();
+                driver.manage().window().maximize();
             } catch (Exception e) {
-                this.driver.quit();
+//                driver.quit();
             }
-        }
         Thread.sleep(2000);
     }
 
@@ -174,7 +167,7 @@ public class WebConnector {
      * @param sec waitする秒数
      */
     public WebDriver switchFrame(String selector) {
-        return this.driver.switchTo().frame(selector);
+        return driver.switchTo().frame(selector);
     }
 
     /**
@@ -200,9 +193,9 @@ public class WebConnector {
     */
 
     public void parentWindow() {
-        String parentHandle = this.driver.getWindowHandle();
+        String parentHandle = driver.getWindowHandle();
         //親画面に戻る
-        this.driver.switchTo().window(parentHandle);
+        driver.switchTo().window(parentHandle);
     }
 
     /**
@@ -213,7 +206,7 @@ public class WebConnector {
         this.screenShotPath = path;
     }
 
-    @Before
+
     public void initSelenium() throws Exception {
     }
 
@@ -222,29 +215,29 @@ public class WebConnector {
      */
     public void destroySelenium() {
         //WebDriver プロセスを終了し、ブラウザを閉じる
-        this.driver.quit();
+        driver.quit();
     }
 
     /**
      * ブラウザのスクリーンショットを実行する
      * @param filename 保存するファイル名（パスは付けない）
      */
-    public void getScreenShot(String filename) {
-        String path = this.screenShotPath + "/" + filename;
+//    public void getScreenShot(String filename) {
+//        String path = this.screenShotPath + "/" + filename;
         /**
          * Chromeではスクショ　できません、2.9では
          * 色々やってみたけど、Dhromeでは Exceptionで動作しないため、無効化
          */
-        if(this.DriverType != BROWSER_TYPE_CR) {
-            TakesScreenshot screen = (TakesScreenshot)this.driver;
-            Path capture = Paths.get(path);
-            try {
-                Files.write(capture, screen.getScreenshotAs(OutputType.BYTES));
-            } catch(Exception e) {
-                this.driver.quit();
-            }
-        }
-    }
+//        if(this.DriverType != BROWSER_TYPE_CR) {
+//            TakesScreenshot screen = (TakesScreenshot)this.driver;
+//            Path capture = Paths.get(path);
+//            try {
+//                Files.write(capture, screen.getScreenshotAs(OutputType.BYTES));
+//            } catch(Exception e) {
+//                this.driver.quit();
+//            }
+//        }
+//    }
 
     /**
      * セレクタに値を送信する
@@ -419,27 +412,31 @@ public class WebConnector {
     /**
      * aタグをクリックする
      * @param text a タグのテキスト
+     * @throws InterruptedException
      */
-    public void linkClickAndWait(String text) {
-        int i = 0;
-        try {
-            WebElement element = this.driver.findElement(By.linkText(text));
-            element.click();
-        } catch(Exception e) {
-            this.driver.quit();
-        }
+    public void linkClickAndWait(String text) throws InterruptedException {
+		WebElement elementPos = driver.findElement(By.partialLinkText(text));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(elementPos);
+		actions.perform();
+		Thread.sleep(500);
+
+		WebElement element = driver.findElement(By.partialLinkText(text));
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		element.click();
+        Thread.sleep(500);
     }
 
 /**  チェックボックスをクリックする
  * @throws InterruptedException */
     public void checkBoxClick(String commandLocater) throws InterruptedException {
-		WebElement elementPos = this.driver.findElement(By.id(commandLocater));
-		Actions actions = new Actions(this.driver);
+		WebElement elementPos = driver.findElement(By.id(commandLocater));
+		Actions actions = new Actions(driver);
 		actions.moveToElement(elementPos);
 		actions.perform();
 		Thread.sleep(500);
 
-		WebElement element = this.driver.findElement(By.id(commandLocater));
+		WebElement element = driver.findElement(By.id(commandLocater));
 		wait.until(ExpectedConditions.elementToBeClickable(element));
 		element.click();
         Thread.sleep(500);
