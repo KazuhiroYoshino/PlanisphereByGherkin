@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.SearchContext;
@@ -46,6 +47,8 @@ public class WebConnector {
     /** Screen Shot FolderName */
     private String screenShotPath = null;
     private Actions builder = null;
+
+    private boolean acceptNextAlert = true;
 
     /**
      * コンストラクタ
@@ -349,7 +352,23 @@ public class WebConnector {
         }
     }
 
-    /**
+    /*
+     * Locater名が、id属性のボタンをクリックする
+     */
+    public void btnClickAndWait_ID(String commandLocater) throws InterruptedException {
+		WebElement elementPos = driver.findElement(By.id(commandLocater));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(elementPos);
+		actions.perform();
+		Thread.sleep(500);
+		WebElement submitButton = driver.findElement(By.id(commandLocater));
+		wait.until(ExpectedConditions.elementToBeClickable(submitButton));
+		submitButton.click();
+
+		Thread.sleep(1000);
+    }
+
+    /*
      * href リンクをクリックする
      * @param text 検索したいリンクテキスト
      */
@@ -386,6 +405,25 @@ public class WebConnector {
         boolean res = content.getText().contains(text);
         return res;
     }
+
+	public boolean isPopUpPresent(String text) throws InterruptedException {
+	    try {
+		        Alert alert = driver.switchTo().alert();
+		        String alertText = alert.getText();
+		        if (acceptNextAlert) {
+		            alert.accept();
+		        } else {
+		            alert.dismiss();
+		        }
+		        boolean res = alertText.contains(text);
+		        Thread.sleep(1000);
+			    acceptNextAlert = true;
+		        return res;
+
+		    } finally {
+		      acceptNextAlert = true;
+		    }
+	}
 
     /**
      * spanタグをクリックする
@@ -475,5 +513,55 @@ public class WebConnector {
             }
         }
     }
+
+
+	public void btnClickAndWait_CSS(String commandLocater) throws InterruptedException {
+		WebElement elementPos = driver.findElement(By.cssSelector(commandLocater));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(elementPos);
+		actions.perform();
+		Thread.sleep(500);
+
+		WebElement element = driver.findElement(By.cssSelector(commandLocater));
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		element.click();
+        Thread.sleep(1000);
+	}
+
+	public void cssButtonClickAndPopUp(String commandLocater) throws InterruptedException {
+		acceptNextAlert = true;
+
+		WebElement exitButton = driver.findElement(By.cssSelector(commandLocater));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(exitButton);
+		actions.perform();
+		Thread.sleep(500);
+		exitButton = driver.findElement(By.cssSelector(commandLocater));
+		wait.until(ExpectedConditions.elementToBeClickable(exitButton));
+		exitButton.click();
+		Thread.sleep(500);
+	}
+
+	public void birthdayInput(String commandLocater, String birthday) throws InterruptedException {
+		String[] inputText = {"//"};
+		if(birthday.length() != 0) {
+			inputText = birthday.split("/", -1);
+			WebElement inputBox = driver.findElement(By.id(commandLocater));
+			wait.until(ExpectedConditions.elementToBeClickable(inputBox));
+			inputBox.clear();
+			Thread.sleep(500);
+			inputBox.sendKeys(inputText[0]);
+			Thread.sleep(500);
+			inputBox.sendKeys(Keys.RIGHT);
+			Thread.sleep(500);
+			inputBox.sendKeys(inputText[1]);
+			Thread.sleep(500);
+			inputBox.sendKeys(Keys.RIGHT);
+			Thread.sleep(500);
+			inputBox.sendKeys(inputText[2]);
+			Thread.sleep(500);
+		}
+	}
+
 
 }

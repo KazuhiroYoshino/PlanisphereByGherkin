@@ -58,6 +58,11 @@ public class StepDefinitions {
         assertTrue(connector.isTextPresent(pattern));
     }
 
+    @ならば("ポップアップ表示に\"([^\"]*)\"と表示される")
+    public void search_popUp(String pattern) throws InterruptedException {
+    	assertTrue(connector.isPopUpPresent(pattern));
+    }
+
 /** クリックイベント各種 */
     /**
      * spanタグセレクタのクリックイベント
@@ -123,6 +128,22 @@ public class StepDefinitions {
     public void index_button_click(String value, String type, int index ) {
         connector.btnByblockClickAndWait(type, value, index-1);
     }
+
+    @ならば("CSSセレクタ名が\"([^\"]*)\"のボタンをクリックする")
+    public void css_button_click(String commandLocater) throws InterruptedException {
+    	connector.btnClickAndWait_CSS(commandLocater);
+    }
+
+    @ならば("IDセレクタ名が\"([^\"]*)\"のボタンをクリックする")
+    public void css_button_clickID(String commandLocater) throws InterruptedException {
+    	connector.btnClickAndWait_ID(commandLocater);
+    }
+
+    @もし("CSSセレクタ名が\"([^\"]*)\"のボタンをクリックしてポップアップ表示を出す")
+    public void css_buttonClickAndPopUp(String commandLocater) throws InterruptedException {
+    	connector.cssButtonClickAndPopUp(commandLocater);
+    }
+
 
 /** チェックボックスのクリックイベント
  * @throws InterruptedException */
@@ -191,6 +212,10 @@ public class StepDefinitions {
         connector.inputAndWait(selector,val);
     }
 
+    @もし("年月日要素\"([^\"]*)\"に\"([^\"]*)\"を入力する")
+    public void birthdayInput(String selector, String birthday) throws InterruptedException {
+    	connector.birthdayInput(selector, birthday);
+    }
 
     @もし("シナリオを終了してブラウザを閉じる$")
     public void close() {
