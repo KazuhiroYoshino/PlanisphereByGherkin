@@ -49,6 +49,27 @@ public class StepDefinitions {
         connector.sleep(sec);
     }
 
+/**  Window切り替え **/
+    @ならば("親子タブを取得する$")
+    public void parent() {
+    	connector.setWindow();
+    }
+
+    @ならば("子タブに切り替える$")
+    public void child() {
+    	connector.setChild();
+    }
+
+    @ならば("画面更新$")
+    public void refresh() throws InterruptedException {
+    	connector.refresh();
+    }
+
+    @もし("\"([^\"]*)\"で指定できるカレンダー表示を消して")
+    public void eraseCalendar(String name) throws InterruptedException {
+    	connector.btnClickAndWait_X(name);
+    }
+
     /**
 * 表示結果のチェック
      * @param pattern 検索するテキスト
@@ -58,10 +79,70 @@ public class StepDefinitions {
         assertTrue(connector.isTextPresent(pattern));
     }
 
-    @ならば("ポップアップ表示に\"([^\"]*)\"と表示される")
+    @ならば("ポップアップ表示に\"([^\"]*)\"と表示される$")
     public void search_popUp(String pattern) throws InterruptedException {
     	assertTrue(connector.isPopUpPresent(pattern));
     }
+
+    @ならば("表示\"([^\"]*)\"のプラン名が\"([^\"]*)\"については表示\"([^\"]*)\"である$")
+    public void test_ContentsList(String commandLocater, String planName, String hyouji) throws InterruptedException {
+    	assertTrue(connector.checkContensList(commandLocater, planName, hyouji));
+    }
+
+    @ならば("合計金額は\"([^\"]*)\"に表示される\"([^\"]*)\"となり$")
+    public void testPrice(String commanLocater, String price) {
+
+    }
+
+    @ならば("部屋タイプは\"([^\"]*)\"に表示される\"([^\"]*)\"となり$")
+    public void testRoomType(String commandLocater, String roomType) {
+
+    }
+
+    @ならば("宿泊期間の表示が正しく$")
+    public void testReserveTerm() {
+
+    }
+
+    @ならば("宿泊人数の表示が\"([^\"]*)\"で\"([^\"]*)\"名様となり$")
+    public void testHeadCount(String commandLocater, String headcount) {
+
+    }
+
+    @ならば("追加プラン1はCSSセレクタ\"([^\"]*)\"の表示が正しく$")
+    public void testOption1(String commandLocater) {
+
+    }
+
+    @ならば("追加プラン2はCSSセレクタ\"([^\"]*)\"の表示が正しく$")
+    public void testOption2(String commandLocater) {
+
+    }
+    @ならば("追加プラン3はCSSセレクタ\"([^\"]*)\"の表示が正しく$")
+    public void testOption3(String commandLocater) {
+
+    }
+
+    @ならば("氏名の表示\"([^\"]*)\"で\"([^\"]*)\"様となり$")
+    public void testUsername(String commandLocater, String username) {
+
+    }
+
+    @ならば("確認の連絡の表示が\"([^\"]*)\"で正しく$")
+    public void testContact(String commandLocater) {
+
+    }
+
+    @ならば("連絡事項の表示が\"([^\"]*)\"で正しく$")
+    public void testComment(String commandLocater) {
+
+    }
+
+    @ならば("ポップアップ表示の\"([^\"]*)\"は\"([^\"]*)\"になり$")
+    public void testPopUp(String commandLocater, String message) {
+
+    }
+
 
 /** クリックイベント各種 */
     /**
@@ -129,20 +210,21 @@ public class StepDefinitions {
         connector.btnByblockClickAndWait(type, value, index-1);
     }
 
-    @ならば("CSSセレクタ名が\"([^\"]*)\"のボタンをクリックする")
+    @ならば("CSSセレクタ名が\"([^\"]*)\"のボタンをクリックする$")
     public void css_button_click(String commandLocater) throws InterruptedException {
     	connector.btnClickAndWait_CSS(commandLocater);
     }
 
-    @ならば("IDセレクタ名が\"([^\"]*)\"のボタンをクリックする")
+    @ならば("IDセレクタ名が\"([^\"]*)\"のボタンをクリックする$")
     public void css_button_clickID(String commandLocater) throws InterruptedException {
     	connector.btnClickAndWait_ID(commandLocater);
     }
 
-    @もし("CSSセレクタ名が\"([^\"]*)\"のボタンをクリックしてポップアップ表示を出す")
+    @もし("CSSセレクタ名が\"([^\"]*)\"のボタンをクリックしてポップアップ表示を出す$")
     public void css_buttonClickAndPopUp(String commandLocater) throws InterruptedException {
     	connector.cssButtonClickAndPopUp(commandLocater);
     }
+
 
 
 /** チェックボックスのクリックイベント
@@ -197,7 +279,7 @@ public class StepDefinitions {
      * 入力要素に Enter キーを入力する
      * @param selector id or name セレクタ名
      */
-     @かつ("かつ\"([^\"]*)\"要素にEnterを入力する$")
+    @かつ("かつ\"([^\"]*)\"要素にEnterを入力する$")
     public void and_enter_element(String selector) {
         connector.inputEnterAndWait(selector);
     }
@@ -212,9 +294,161 @@ public class StepDefinitions {
         connector.inputAndWait(selector,val);
     }
 
-    @もし("年月日要素\"([^\"]*)\"に\"([^\"]*)\"を入力する")
+    @もし("年月日要素\"([^\"]*)\"に\"([^\"]*)\"を入力する$")
     public void birthdayInput(String selector, String birthday) throws InterruptedException {
     	connector.birthdayInput(selector, birthday);
+    }
+
+    @もし("宿泊プランを\"([^\"]*)\"にして$")
+    public void planSelect(String plan) {
+    	String commandLocater;
+    	switch(plan) {
+    	case("お得な特典付きプラン"):
+    		commandLocater = "./reserve.html?plan-id=0";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("プレミアムプラン"):
+    		commandLocater = "./reserve.html?plan-id=1";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("ディナー付きプラン"):
+    		commandLocater = "./reserve.html?plan-id=2";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("お得なプラン"):
+    		commandLocater = "./reserve.html?plan-id=3";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("素泊まり"):
+    		commandLocater = "./reserve.html?plan-id=4";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("出張ビジネスプラン"):
+    		commandLocater = "./reserve.html?plan-id=5";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("エステ・マッサージプラン"):
+    		commandLocater = "./reserve.html?plan-id=6";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("貸し切り露天風呂プラン"):
+    		commandLocater = "./reserve.html?plan-id=7";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("カップル限定プラン"):
+    		commandLocater = "./reserve.html?plan-id=8";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	case("テーマパーク優待プラン"):
+    		commandLocater = "./reserve.html?plan-id=9";
+    		connector.clickHrefAndWait(commandLocater);
+    		break;
+    	default:
+    		commandLocater = "./reserve.html?plan-id=0";
+    		connector.clickHrefAndWait(commandLocater);
+    	}
+    }
+
+    @もし("宿泊初日の曜日を\"([^\"]*)\"に\"([^\"]*)\"として$")
+    public void fromDay(String commandLocater, String startDay) throws InterruptedException {
+    	switch(startDay) {
+    	case("Sunday"):
+            connector.sunday(commandLocater);
+            connector.weekEnd = 0;
+            connector.dateFromSet();
+            break;
+    	case("Monday"):
+            connector.monday(commandLocater);
+            connector.weekEnd = 0;
+            connector.dateFromSet();
+            break;
+    	case("Tuesday"):
+            connector.tuesday(commandLocater);
+            connector.weekEnd = 0;
+            connector.dateFromSet();
+            break;
+    	case("Wednesday"):
+            connector.wednesday(commandLocater);
+            connector.weekEnd = 0;
+            connector.dateFromSet();
+            break;
+    	case("Thursday"):
+            connector.thursday(commandLocater);
+            connector.weekEnd = 0;
+            connector.dateFromSet();
+            break;
+    	case("Friday"):
+            connector.friday(commandLocater);
+            connector.weekEnd = 0;
+            connector.dateFromSet();
+            break;
+    	case("Saturday"):
+            connector.saturday(commandLocater);
+            connector.weekEnd = 0;
+            connector.dateFromSet();
+            break;
+        default:
+    	}
+
+    }
+
+    @もし("連泊数を\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void termSetting(String commandLocater, String termText) {
+        connector.termValue = Integer.valueOf(termText) - connector.weekEnd;
+        connector.termValueWeekEnd = connector.weekEnd;
+        int term = connector.termValue + connector.termValueWeekEnd;
+        connector.inputAndWait(commandLocater, termText);
+        connector.termSet(term);
+    }
+
+    @もし("宿泊人数を\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void headSetting(String commandLocater, String headText) {
+
+    }
+
+    @もし("朝食バイキング有無を\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void breakFastSetting(String commandLocater, String breakfast) {
+
+    }
+
+    @もし("昼からチェックインプランを\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void earlySetting(String commanLocater, String earlyset) {
+
+    }
+
+    @もし("お得な観光プランを\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void sightSeeingSetting(String commandLocater, String seeing) {
+
+    }
+
+    @もし("氏名を\"([^\"]*)\"で\"([^\"]*)\"として$")
+    public void nameSetting(String commandLocater, String name) {
+
+    }
+
+    @もし("連絡手段を\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void contactSetting(String commandLocater, String contact) {
+
+    }
+
+    @もし("電話番号を\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void telSetting(String commandLocater, String tel) {
+
+    }
+
+    @もし("メールアドレスを\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void mailSetting(String commandLocater, String email) {
+
+    }
+
+    @もし("連絡事項を\"([^\"]*)\"で\"([^\"]*)\"にして$")
+    public void comentSetting(String commandLocater, String coment) {
+
+    }
+
+    @もし("予約内容を記録して$")
+    public void reserveRec() {
+
     }
 
     @もし("シナリオを終了してブラウザを閉じる$")

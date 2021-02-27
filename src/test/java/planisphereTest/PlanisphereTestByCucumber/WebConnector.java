@@ -4,8 +4,10 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -57,7 +59,18 @@ public class WebConnector {
 
 	public Date dt;
 	public String testDate;
+	public int weekEnd;
+	public String dateFrom;
+	public String dateTo;
+
+	public int termValue;
+	public int termValueWeekEnd;
+
+	public int headCountValue;
+
     public static WebDriverWait wait;
+    private String window1;
+    private String window2;
 
     /**
      * WebDriverの選択
@@ -201,6 +214,25 @@ public class WebConnector {
         driver.switchTo().window(parentHandle);
     }
 
+    public void setWindow() {
+        Set<String> set = driver.getWindowHandles();
+        java.util.Iterator<String> it = set.iterator();
+        window1 = it.next();
+        window2 = it.next();
+        driver.switchTo().window(window1);
+    }
+
+    public void setChild() {
+    	driver.switchTo().window(window2);
+    }
+
+    public void refresh() throws InterruptedException {
+    	driver.navigate().refresh();
+    	Thread.sleep(5000);
+    }
+    public void eraseCalendar() {
+
+    }
     /**
      * スクリーンショット画像格納フォルダを指定する
      * @param path フォルダ名
@@ -369,6 +401,22 @@ public class WebConnector {
     }
 
     /*
+     * Locater名が、xpath属性のエレメントをクリックする
+     */
+    public void btnClickAndWait_X(String commandLocater) throws InterruptedException {
+		WebElement elementPos = driver.findElement(By.xpath(commandLocater));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(elementPos);
+		actions.perform();
+		Thread.sleep(500);
+		WebElement element = driver.findElement(By.xpath(commandLocater));
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		element.click();
+
+		Thread.sleep(500);
+    }
+
+    /*
      * href リンクをクリックする
      * @param text 検索したいリンクテキスト
      */
@@ -423,6 +471,23 @@ public class WebConnector {
 		    } finally {
 		      acceptNextAlert = true;
 		    }
+	}
+
+	public boolean checkContensList(String commandLocater, String planName, String hyouji) throws InterruptedException {
+		String targetContent;
+		List<WebElement> contentsList = driver.findElements(By.className(commandLocater));
+		boolean res;
+
+		for(WebElement content : contentsList) {
+			targetContent = content.getText();
+			if(targetContent.equals(planName)) {
+				res = hyouji.contains("yes");
+			}else {
+				res= hyouji.contains("no");
+			}
+		}
+		Thread.sleep(500);
+		return false;
 	}
 
     /**
@@ -561,6 +626,369 @@ public class WebConnector {
 			inputBox.sendKeys(inputText[2]);
 			Thread.sleep(500);
 		}
+	}
+
+
+	public void sunday(String commandLocater) throws InterruptedException {
+		Date reserveDate;
+		String testReserveDate;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.DATE, 1);
+		switch(calendar.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.SUNDAY:
+//			calendar.add(Calendar.DATE, 1);
+			break;
+		case Calendar.MONDAY:
+			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.TUESDAY:
+			calendar.add(Calendar.DATE, 5);
+			break;
+		case Calendar.WEDNESDAY:
+			calendar.add(Calendar.DATE, 4);
+			break;
+		case Calendar.THURSDAY:
+			calendar.add(Calendar.DATE, 3);
+			break;
+		case Calendar.FRIDAY:
+			calendar.add(Calendar.DATE, 2);
+			break;
+		case Calendar.SATURDAY:
+			calendar.add(Calendar.DATE, 1);
+			break;
+		default:
+		}
+
+		reserveDate = calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		testReserveDate = sdf.format(reserveDate);
+		dt = reserveDate;
+
+		String inputText = testReserveDate.substring(0, 10);
+
+        WebElement inputDate = driver.findElement(By.id(commandLocater));
+        wait.until(ExpectedConditions.elementToBeClickable(inputDate));
+        inputDate.clear();
+        Thread.sleep(500);
+//        reserveYear = reserveYear + "\n";
+        inputDate.sendKeys(inputText);
+        Thread.sleep(500);
+	}
+
+	public void dateFromSet() {
+		String reserveFrom;
+		int reserveYear;
+		int reserveMonth;
+		int reserveDay;
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		reserveFrom = sdf.format(dt);
+		reserveYear = Integer.valueOf(reserveFrom.substring(0, 4));
+		reserveMonth = Integer.valueOf(reserveFrom.substring(5, 7));
+		reserveDay = Integer.valueOf(reserveFrom.substring(8, 10));
+		dateFrom = String.valueOf(reserveYear) + "年" + String.valueOf(reserveMonth) + "月" + String.valueOf(reserveDay) + "日";
+	}
+
+	public void monday(String commandLocater) throws InterruptedException {
+		Date reserveDate;
+		String testReserveDate;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.DATE, 1);
+		switch(calendar.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.SUNDAY:
+			calendar.add(Calendar.DATE, 1);
+			break;
+		case Calendar.MONDAY:
+//			calendar.add(Calendar.DATE, 5);
+			break;
+		case Calendar.TUESDAY:
+			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.WEDNESDAY:
+			calendar.add(Calendar.DATE, 5);
+			break;
+		case Calendar.THURSDAY:
+			calendar.add(Calendar.DATE, 4);
+			break;
+		case Calendar.FRIDAY:
+			calendar.add(Calendar.DATE, 3);
+			break;
+		case Calendar.SATURDAY:
+			calendar.add(Calendar.DATE, 2);
+			break;
+		default:
+		}
+
+		reserveDate = calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		testReserveDate = sdf.format(reserveDate);
+		dt = reserveDate;
+
+		String inputText = testReserveDate.substring(0, 10);
+
+        WebElement inputDate = driver.findElement(By.id(commandLocater));
+        wait.until(ExpectedConditions.elementToBeClickable(inputDate));
+        inputDate.clear();
+        Thread.sleep(500);
+//        reserveYear = reserveYear + "\n";
+        inputDate.sendKeys(inputText);
+        Thread.sleep(500);
+	}
+
+	public void tuesday(String commandLocater) throws InterruptedException {
+		Date reserveDate;
+		String testReserveDate;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.DATE, 1);
+		switch(calendar.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.SUNDAY:
+			calendar.add(Calendar.DATE, 2);
+			break;
+		case Calendar.MONDAY:
+			calendar.add(Calendar.DATE, 1);
+			break;
+		case Calendar.TUESDAY:
+//			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.WEDNESDAY:
+			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.THURSDAY:
+			calendar.add(Calendar.DATE, 5);
+			break;
+		case Calendar.FRIDAY:
+			calendar.add(Calendar.DATE, 4);
+			break;
+		case Calendar.SATURDAY:
+			calendar.add(Calendar.DATE, 3);
+			break;
+		default:
+		}
+
+		reserveDate = calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		testReserveDate = sdf.format(reserveDate);
+		dt = reserveDate;
+
+		String inputText = testReserveDate.substring(0, 10);
+
+        WebElement inputDate = driver.findElement(By.id(commandLocater));
+        wait.until(ExpectedConditions.elementToBeClickable(inputDate));
+        inputDate.clear();
+        Thread.sleep(500);
+//        reserveYear = reserveYear + "\n";
+        inputDate.sendKeys(inputText);
+        Thread.sleep(500);
+	}
+
+	public void wednesday(String commandLocater) throws InterruptedException {
+		Date reserveDate;
+		String testReserveDate;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.DATE, 1);
+		switch(calendar.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.SUNDAY:
+			calendar.add(Calendar.DATE, 3);
+			break;
+		case Calendar.MONDAY:
+			calendar.add(Calendar.DATE, 2);
+			break;
+		case Calendar.TUESDAY:
+			calendar.add(Calendar.DATE, 1);
+			break;
+		case Calendar.WEDNESDAY:
+//			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.THURSDAY:
+			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.FRIDAY:
+			calendar.add(Calendar.DATE, 5);
+			break;
+		case Calendar.SATURDAY:
+			calendar.add(Calendar.DATE, 4);
+			break;
+		default:
+		}
+
+		reserveDate = calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		testReserveDate = sdf.format(reserveDate);
+		dt = reserveDate;
+
+		String inputText = testReserveDate.substring(0, 10);
+
+        WebElement inputDate = driver.findElement(By.id(commandLocater));
+        wait.until(ExpectedConditions.elementToBeClickable(inputDate));
+        inputDate.clear();
+        Thread.sleep(500);
+//        reserveYear = reserveYear + "\n";
+        inputDate.sendKeys(inputText);
+        Thread.sleep(500);
+	}
+
+	public void thursday(String commandLocater) throws InterruptedException {
+		Date reserveDate;
+		String testReserveDate;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.DATE, 1);
+		switch(calendar.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.SUNDAY:
+			calendar.add(Calendar.DATE, 4);
+			break;
+		case Calendar.MONDAY:
+			calendar.add(Calendar.DATE, 3);
+			break;
+		case Calendar.TUESDAY:
+			calendar.add(Calendar.DATE, 2);
+			break;
+		case Calendar.WEDNESDAY:
+			calendar.add(Calendar.DATE, 1);
+			break;
+		case Calendar.THURSDAY:
+//			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.FRIDAY:
+			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.SATURDAY:
+			calendar.add(Calendar.DATE, 5);
+			break;
+		default:
+		}
+
+		reserveDate = calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		testReserveDate = sdf.format(reserveDate);
+		dt = reserveDate;
+
+		String inputText = testReserveDate.substring(0, 10);
+
+        WebElement inputDate = driver.findElement(By.id(commandLocater));
+        wait.until(ExpectedConditions.elementToBeClickable(inputDate));
+        inputDate.clear();
+        Thread.sleep(500);
+//        reserveYear = reserveYear + "\n";
+        inputDate.sendKeys(inputText);
+        Thread.sleep(500);
+	}
+
+	public void friday(String commandLocater) throws InterruptedException {
+		Date reserveDate;
+		String testReserveDate;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.DATE, 1);
+		switch(calendar.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.SUNDAY:
+			calendar.add(Calendar.DATE, 5);
+			break;
+		case Calendar.MONDAY:
+			calendar.add(Calendar.DATE, 4);
+			break;
+		case Calendar.TUESDAY:
+			calendar.add(Calendar.DATE, 3);
+			break;
+		case Calendar.WEDNESDAY:
+			calendar.add(Calendar.DATE, 2);
+			break;
+		case Calendar.THURSDAY:
+			calendar.add(Calendar.DATE, 1);
+			break;
+		case Calendar.FRIDAY:
+//			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.SATURDAY:
+			calendar.add(Calendar.DATE, 6);
+			break;
+		default:
+		}
+
+		reserveDate = calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		testReserveDate = sdf.format(reserveDate);
+		dt = reserveDate;
+
+		String inputText = testReserveDate.substring(0, 10);
+
+        WebElement inputDate = driver.findElement(By.id(commandLocater));
+        wait.until(ExpectedConditions.elementToBeClickable(inputDate));
+        inputDate.clear();
+        Thread.sleep(500);
+//        reserveYear = reserveYear + "\n";
+        inputDate.sendKeys(inputText);
+        Thread.sleep(500);
+	}
+
+	public void saturday(String commandLocater) throws InterruptedException {
+		Date reserveDate;
+		String testReserveDate;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.DATE, 1);
+		switch(calendar.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.SUNDAY:
+			calendar.add(Calendar.DATE, 6);
+			break;
+		case Calendar.MONDAY:
+			calendar.add(Calendar.DATE, 5);
+			break;
+		case Calendar.TUESDAY:
+			calendar.add(Calendar.DATE, 4);
+			break;
+		case Calendar.WEDNESDAY:
+			calendar.add(Calendar.DATE, 3);
+			break;
+		case Calendar.THURSDAY:
+			calendar.add(Calendar.DATE, 2);
+			break;
+		case Calendar.FRIDAY:
+			calendar.add(Calendar.DATE, 1);
+			break;
+		case Calendar.SATURDAY:
+//			calendar.add(Calendar.DATE, 1);
+			break;
+		default:
+		}
+
+		reserveDate = calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		testReserveDate = sdf.format(reserveDate);
+		dt = reserveDate;
+
+		String inputText = testReserveDate.substring(0, 10);
+
+        WebElement inputDate = driver.findElement(By.id(commandLocater));
+        wait.until(ExpectedConditions.elementToBeClickable(inputDate));
+        inputDate.clear();
+        Thread.sleep(500);
+//        reserveYear = reserveYear + "\n";
+        inputDate.sendKeys(inputText);
+        Thread.sleep(500);
+	}
+
+	public void termSet(int term) {
+		Date reserveEnd;
+		String reserveTo;
+		int reserveToYear;
+		int reserveToMonth;
+		int reserveToDay;
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.DATE, term);
+		reserveEnd = calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		reserveTo = sdf.format(reserveEnd);
+		reserveToYear = Integer.valueOf(reserveTo.substring(0, 4));
+		reserveToMonth = Integer.valueOf(reserveTo.substring(5, 7));
+		reserveToDay = Integer.valueOf(reserveTo.substring(8, 10));
+		dateTo = String.valueOf(reserveToYear) + "年" + String.valueOf(reserveToMonth) + "月" + String.valueOf(reserveToDay) + "日";
 	}
 
 
