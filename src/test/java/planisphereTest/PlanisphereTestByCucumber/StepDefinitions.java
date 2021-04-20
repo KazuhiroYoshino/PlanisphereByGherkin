@@ -10,7 +10,6 @@ import cucumber.api.java.ja.前提;
 public class StepDefinitions {
     private WebConnector connector = new WebConnector();
 
-
 //    public void WebSteps(WebConnector connector) {
 //        this.connector = connector;
 //    }
@@ -42,6 +41,17 @@ public class StepDefinitions {
     public void window_maximized() throws InterruptedException {
         connector.setWindowMax();
     }
+
+    @もし("ブラウザを英語モードにする$")
+    public void englishMode() {
+  	  connector.setLangEnglish();
+    }
+
+    @もし("ブラウザを日本語モードにする$")
+    public void japaneseMode() {
+  	  connector.setlangJapanese();
+    }
+
 
 /**　待機 */
     @ならば("^\"([^\"]*)\"秒待つ$")
@@ -82,6 +92,11 @@ public class StepDefinitions {
     @ならば("ポップアップ表示に\"([^\"]*)\"と表示される$")
     public void search_popUp(String pattern) throws InterruptedException {
     	assertTrue(connector.isPopUpPresent(pattern));
+    }
+
+    @ならば("ページタイトルが\"([^\"]*)\"である$")
+    public void test_page_title(String title) {
+  	  assertTrue(connector.isTitlePresent(title));
     }
 
     @ならば("表示\"([^\"]*)\"のプラン名が\"([^\"]*)\"については表示\"([^\"]*)\"である$")

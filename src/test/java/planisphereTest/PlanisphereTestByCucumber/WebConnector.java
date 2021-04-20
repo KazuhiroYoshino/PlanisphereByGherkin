@@ -16,6 +16,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -49,6 +50,7 @@ public class WebConnector {
     /** Screen Shot FolderName */
     private String screenShotPath = null;
     private Actions builder = null;
+    private ChromeOptions options = new ChromeOptions();
 
     private boolean acceptNextAlert = true;
 
@@ -123,7 +125,8 @@ public class WebConnector {
 
         default: // Chrome
             System.setProperty("webdriver.chrome.driver", "C:\\WebDrivers\\chromedriver_win32\\chromedriver.exe");
-            driver = new ChromeDriver();
+//            driver = new ChromeDriver();
+            driver = new ChromeDriver(options);
             break;
         }
 //        this.builder =  new Actions(this.driver);
@@ -165,6 +168,25 @@ public class WebConnector {
             }
         Thread.sleep(2000);
     }
+
+    /**
+     * 使用言語対応
+     */
+    public void setLangEnglish() {
+//        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--lang=en-GB");
+//      Map<String, Object> prefs = new HashMap<String, Object>();
+//      prefs.put("intl.accept_languages", "en-GB,en");
+//      options.setExperimentalOption("prefs", prefs);
+
+    }
+
+    public void setlangJapanese() {
+//        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--lang=ja-JP");
+
+    }
+
 
     /**
      * 指定時間待つ
@@ -991,5 +1013,12 @@ public class WebConnector {
 		dateTo = String.valueOf(reserveToYear) + "年" + String.valueOf(reserveToMonth) + "月" + String.valueOf(reserveToDay) + "日";
 	}
 
+    /**
+	*ページタイトルの検証
+	*/
+    public boolean isTitlePresent(String title) {
+    	boolean res = WebConnector.driver.getTitle().contains(title);
+    	return res;
+    }
 
 }
