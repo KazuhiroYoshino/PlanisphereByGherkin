@@ -8,6 +8,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -60,19 +62,31 @@ public class WebConnector {
 //    public WebConnector() {}
 
 	public Date dt;
-	public String testDate;
-	public int weekEnd;
+
+//	public String testDate;
+
 	public String dateFrom;
 	public String dateTo;
 
-	public int termValue;
-	public int termValueWeekEnd;
+
+
 
 	public int headCountValue;
+	public String breakFastValue;
+	public String planAvalue;
+	public String planBvalue;
+	public String guestValue;
+
+    public String username;
+    public String contact;
+    public String email;
+    public String tel;
+
 
     public static WebDriverWait wait;
     private String window1;
     private String window2;
+
 
     /**
      * WebDriverの選択
@@ -134,9 +148,9 @@ public class WebConnector {
         //暗黙wait
         //this.driver.manage().timeouts().implicitlyWait(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
 
-		dt = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		testDate = sdf.format(dt);
+//		dt = new Date();
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//		testDate = sdf.format(dt);
 
         wait = new WebDriverWait(driver, 10);
 
@@ -169,6 +183,14 @@ public class WebConnector {
         Thread.sleep(2000);
     }
 
+    public void rebootBrowser(String mobileBrowserType, String mobileUrl) throws InterruptedException {
+
+    	selectWebDriver(mobileBrowserType);
+    	openAndWait(mobileUrl);
+
+    }
+
+
     /**
      * 使用言語対応
      */
@@ -200,12 +222,16 @@ public class WebConnector {
         }
     }
 
-    /**
-     * iFrame を切り替える
-     * @param sec waitする秒数
-     */
+/**
+ * iFrame を切り替える
+ * @param sec waitする秒数
+ */
     public WebDriver switchFrame(String selector) {
         return driver.switchTo().frame(selector);
+    }
+
+    public WebDriver switchDefaultFrame() {
+    	return driver.switchTo().defaultContent();
     }
 
     /**
@@ -247,6 +273,11 @@ public class WebConnector {
     public void setChild() {
     	driver.switchTo().window(window2);
     }
+
+    public void setParent() {
+    	driver.switchTo().window(window1);
+    }
+
 
     public void refresh() throws InterruptedException {
     	driver.navigate().refresh();
@@ -296,6 +327,24 @@ public class WebConnector {
 //        }
 //    }
 
+/**
+ * 画面から値取得系
+ * @throws InterruptedException
+ */
+    public String getText(String commandLocater3) throws InterruptedException {
+		String getText;
+		WebElement text = driver.findElement(By.id(commandLocater3));
+        wait.until(ExpectedConditions.visibilityOf(text));
+        getText = text.getAttribute("value");
+        Thread.sleep(500);
+
+		return getText;
+	}
+
+/**
+ * テキストボックス入力系
+ */
+
     /**
      * セレクタに値を送信する
      * @param selector id or name属性セレクタ
@@ -303,16 +352,34 @@ public class WebConnector {
      */
     public void inputAndWait(String selector, String value) {
         try {
-            WebElement element = this.driver.findElement(By.id(selector));
+            WebElement element = driver.findElement(By.id(selector));
+    		Actions actions = new Actions(driver);
+    		actions.moveToElement(element);
+    		actions.perform();
+    		Thread.sleep(500);
+
+            wait.until(ExpectedConditions.elementToBeClickable(element));
+
+            element.clear();
+            Thread.sleep(500);
             element.sendKeys(value);
             return;
         } catch(Exception e) {
         }
         try {
-            WebElement element = this.driver.findElement(By.name(selector));
+            WebElement element = driver.findElement(By.name(selector));
+    		Actions actions = new Actions(driver);
+    		actions.moveToElement(element);
+    		actions.perform();
+    		Thread.sleep(500);
+
+            wait.until(ExpectedConditions.elementToBeClickable(element));
+
+            element.clear();
+            Thread.sleep(500);
             element.sendKeys(value);
         } catch(Exception e) {
-            this.driver.quit();
+//            driver.quit();
         }
     }
 
@@ -323,16 +390,16 @@ public class WebConnector {
      */
     public void inputEnterAndWait(String selector) {
         try {
-            WebElement element = this.driver.findElement(By.id(selector));
+            WebElement element = driver.findElement(By.id(selector));
             element.sendKeys(Keys.RETURN);
             return;
         } catch(Exception e) {
         }
         try {
-            WebElement element = this.driver.findElement(By.name(selector));
+            WebElement element = driver.findElement(By.name(selector));
             element.sendKeys(Keys.RETURN);
         } catch(Exception e) {
-            this.driver.quit();
+            driver.quit();
         }
     }
 
@@ -342,11 +409,11 @@ public class WebConnector {
      */
     public void btnClickAndWait(String value) {
         try {
-            WebElement element = this.driver.findElement(
+            WebElement element = driver.findElement(
                 By.xpath("//input[@type=\"submit\" and @value=\"" + value + "\"]"));
             element.click();
         } catch(Exception e) {
-            this.driver.quit();
+            driver.quit();
         }
     }
 
@@ -357,7 +424,7 @@ public class WebConnector {
      */
     public void btnClickAndWait(String type, String label) {
         try {
-            List <WebElement>element = this.driver.findElements(By.xpath("//input[@type=\"" + type + "\"]"));
+            List <WebElement>element = driver.findElements(By.xpath("//input[@type=\"" + type + "\"]"));
             for(WebElement entity : element) {
                 if(entity.getAttribute("value").equals(label)) {
                     entity.click();
@@ -365,7 +432,7 @@ public class WebConnector {
                 }
             }
         } catch(Exception e) {
-            this.driver.quit();
+            driver.quit();
         }
     }
 
@@ -379,7 +446,7 @@ public class WebConnector {
     public void btnByblockClickAndWait(String selector, String value, int index) {
         int i = 0;
         try {
-            List <WebElement>element = this.driver.findElements(
+            List <WebElement>element = driver.findElements(
                     By.xpath("//input[@type=\"" + selector + "\" and @value=\"" + value + "\"]"));
             for(WebElement entity : element) {
                 if(i == index) {
@@ -389,7 +456,7 @@ public class WebConnector {
                 i++;
             }
         } catch(Exception e) {
-            this.driver.quit();
+            driver.quit();
         }
     }
 
@@ -399,10 +466,10 @@ public class WebConnector {
      */
     public void btnBynameClickAndWait(String selector) {
         try {
-            WebElement element = this.driver.findElement(By.name(selector));
+            WebElement element = driver.findElement(By.name(selector));
             element.click();
         } catch(Exception e) {
-            this.driver.quit();
+            driver.quit();
         }
     }
 
@@ -445,10 +512,10 @@ public class WebConnector {
     public void clickAndWait(String text) {
         try {
             //エレメントから、a href のリンク文字列を探す
-            WebElement element = this.driver.findElement(By.linkText(text));
+            WebElement element = driver.findElement(By.linkText(text));
             element.click();
         } catch(Exception e) {
-            this.driver.quit();
+            driver.quit();
         }
     }
 
@@ -459,11 +526,216 @@ public class WebConnector {
     public void clickHrefAndWait(String href) {
         try {
             //エレメントから、a href のリンクを探す
-            WebElement element = this.driver.findElement(By.xpath("//a[@href='"+href+"']"));
+            WebElement element = driver.findElement(By.xpath("//a[@href='"+href+"']"));
             element.click();    //見つかったらクリック
         } catch(Exception e) {
         }
     }
+
+    /**
+     * spanタグをクリックする
+     * @param tagname "span"を期待
+     * @param text タグから検索したい文字列
+     */
+    public void spanClickAndWait(String tagname, String text) {
+        int i = 0;
+        try {
+            //tagnameの名前のエレメントを探す
+            List <WebElement>element = driver.findElements(By.tagName(tagname));
+            for(WebElement entity : element) {
+                //エレメントのテキストが検索したい文字列と合致
+                if(entity.getText().equals(text)) {
+                    entity.click(); //エレメントをクリックする
+                    break;
+                }
+            }
+        } catch(Exception e) {
+            driver.quit();
+        }
+    }
+
+    /**
+     * aタグをクリックする
+     * @param text a タグのテキスト
+     * @throws InterruptedException
+     */
+    public void linkClickAndWait(String text) throws InterruptedException {
+		WebElement elementPos = driver.findElement(By.partialLinkText(text));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(elementPos);
+		actions.perform();
+		Thread.sleep(500);
+
+		WebElement element = driver.findElement(By.partialLinkText(text));
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		element.click();
+        Thread.sleep(500);
+    }
+
+/**  チェックボックスをクリックする
+ * @throws InterruptedException */
+    public void checkBoxClick(String commandLocater, String state) throws InterruptedException {
+		WebElement elementPos = driver.findElement(By.id(commandLocater));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(elementPos);
+		actions.perform();
+		Thread.sleep(500);
+
+		WebElement element = driver.findElement(By.id(commandLocater));
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		if(state.equals("on")) {
+			if(element.isSelected() == false) {
+				element.click();
+			}
+		}
+		if(state.equals("off")) {
+			if(element.isSelected() == true) {
+				element.click();
+			}
+		}
+        Thread.sleep(500);
+    }
+
+/**  ドロップダウンメニューから選択する
+ * @throws InterruptedException */
+    public void dropDownSelect(String commandLocater, String selText) throws InterruptedException {
+		WebElement element = driver.findElement(By.id(commandLocater));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(element);
+		actions.perform();
+		Thread.sleep(1000);
+        Select output_Select = new Select(driver.findElement(By.id(commandLocater)));
+        output_Select.selectByVisibleText(selText);
+        Thread.sleep(500);
+
+    }
+
+
+
+/**
+ * 検証系
+ */
+    /**
+     * 宿泊料金の検証
+     */
+    public boolean testPrice(String commandLocater1, int price) {
+    	boolean testResult = false;
+
+		String priceText;
+		int priceData;
+//		int up25Price = 8750;
+//		int normalPrice = 7000;
+		int calcPrice;
+
+        WebElement element = driver.findElement(By.id(commandLocater1));
+        wait.until(ExpectedConditions.visibilityOf(element));
+        priceText = element.getText();
+        priceText = priceText.replace("円", "");
+        priceText = priceText.replace("（税込み）", "");
+        priceText = priceText.replace("合計", "");
+        priceText = priceText.replace(",", "").trim();
+
+        priceData = Integer.valueOf(priceText);
+
+        calcPrice = price;
+        if(priceData == calcPrice) {
+			testResult = true;
+		}else {
+			testResult = false;
+		}
+		return testResult;
+	}
+
+    /**
+     * 宿泊期間の検証
+     * @throws InterruptedException
+     */
+    public boolean testTerm(String commandLocater, int term) throws InterruptedException {
+    	boolean testResult = false;
+
+		String termText;
+		String stay = String.valueOf(term) + "泊";
+
+        WebElement elementTerm = driver.findElement(By.id(commandLocater));
+        wait.until(ExpectedConditions.visibilityOf(elementTerm));
+        termText = elementTerm.getText();
+
+        Pattern pFrom = Pattern.compile(dateFrom);
+        Matcher mFrom = pFrom.matcher(termText);
+        if(mFrom.find()) {
+        	testResult = true;
+        }else {
+        	testResult = false;
+        }
+
+        Pattern pTo = Pattern.compile(dateTo);
+        Matcher mTo = pTo.matcher(termText);
+        if(mTo.find()) {
+        	testResult = true;
+        }else {
+        	testResult = false;
+        }
+
+        Pattern pStay = Pattern.compile(stay);
+        Matcher mStay = pStay.matcher(termText);
+        if(mStay.find()) {
+        	testResult = true;
+        }else {
+        	testResult = false;
+        }
+        Thread.sleep(500);
+
+    	return testResult;
+    }
+
+    /**
+     * 指定したエレメントのテキストが期待値通りかチェックする
+     * @throws InterruptedException
+     */
+    public boolean testText(String selector, String text) throws InterruptedException {
+    	String resultText;
+    	boolean res;
+
+    	WebElement element = driver.findElement(By.id(selector));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(element);
+		actions.perform();
+		Thread.sleep(500);
+
+    	wait.until(ExpectedConditions.visibilityOf(element));
+    	resultText = element.getText();
+    	if(resultText.equalsIgnoreCase(text)) {
+    		res = true;
+    	}else {
+    		res = false;
+    	}
+
+    	return res;
+    }
+
+    public boolean testTextX(String selector, String text) throws InterruptedException {
+    	String resultText;
+    	boolean res;
+
+    	WebElement element = driver.findElement(By.xpath(selector));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(element);
+		actions.perform();
+		Thread.sleep(500);
+
+    	wait.until(ExpectedConditions.visibilityOf(element));
+    	resultText = element.getText();
+    	if(resultText.equalsIgnoreCase(text)) {
+    		res = true;
+    	}else {
+    		res = false;
+    	}
+
+    	return res;
+    }
+
+
+
 
     /**
      * 指定されたテキストが、現在のページ内にあるかチェックする
@@ -471,7 +743,7 @@ public class WebConnector {
      * @return テキストが見つかれば true, 見つからなければ false を返す
      */
     public boolean isTextPresent(String text) {
-        WebElement content = this.driver.findElement(By.tagName("body"));
+        WebElement content = driver.findElement(By.tagName("body"));
         boolean res = content.getText().contains(text);
         return res;
     }
@@ -498,7 +770,7 @@ public class WebConnector {
 	public boolean checkContensList(String commandLocater, String planName, String hyouji) throws InterruptedException {
 		String targetContent;
 		List<WebElement> contentsList = driver.findElements(By.className(commandLocater));
-		boolean res;
+		boolean res = false;
 
 		for(WebElement content : contentsList) {
 			targetContent = content.getText();
@@ -507,84 +779,18 @@ public class WebConnector {
 			}else {
 				res= hyouji.contains("no");
 			}
+			if(targetContent.equals(planName)) {
+				break;
+			}
 		}
 		Thread.sleep(500);
-		return false;
+		return res;
 	}
-
-    /**
-     * spanタグをクリックする
-     * @param tagname "span"を期待
-     * @param text タグから検索したい文字列
-     */
-    public void spanClickAndWait(String tagname, String text) {
-        int i = 0;
-        try {
-            //tagnameの名前のエレメントを探す
-            List <WebElement>element = this.driver.findElements(By.tagName(tagname));
-            for(WebElement entity : element) {
-                //エレメントのテキストが検索したい文字列と合致
-                if(entity.getText().equals(text)) {
-                    entity.click(); //エレメントをクリックする
-                    break;
-                }
-            }
-        } catch(Exception e) {
-            this.driver.quit();
-        }
-    }
-
-    /**
-     * aタグをクリックする
-     * @param text a タグのテキスト
-     * @throws InterruptedException
-     */
-    public void linkClickAndWait(String text) throws InterruptedException {
-		WebElement elementPos = driver.findElement(By.partialLinkText(text));
-		Actions actions = new Actions(driver);
-		actions.moveToElement(elementPos);
-		actions.perform();
-		Thread.sleep(500);
-
-		WebElement element = driver.findElement(By.partialLinkText(text));
-		wait.until(ExpectedConditions.elementToBeClickable(element));
-		element.click();
-        Thread.sleep(500);
-    }
-
-/**  チェックボックスをクリックする
- * @throws InterruptedException */
-    public void checkBoxClick(String commandLocater) throws InterruptedException {
-		WebElement elementPos = driver.findElement(By.id(commandLocater));
-		Actions actions = new Actions(driver);
-		actions.moveToElement(elementPos);
-		actions.perform();
-		Thread.sleep(500);
-
-		WebElement element = driver.findElement(By.id(commandLocater));
-		wait.until(ExpectedConditions.elementToBeClickable(element));
-		element.click();
-        Thread.sleep(500);
-    }
-
-/**  ドロップダウンメニューから選択する
- * @throws InterruptedException */
-    public void dropDownSelect(String commandLocater, String selText) throws InterruptedException {
-		WebElement element = this.driver.findElement(By.id(commandLocater));
-		Actions actions = new Actions(this.driver);
-		actions.moveToElement(element);
-		actions.perform();
-		Thread.sleep(1000);
-        Select output_Select = new Select(this.driver.findElement(By.id(commandLocater)));
-        output_Select.selectByVisibleText(selText);
-        Thread.sleep(500);
-
-    }
 
 
     public void assertTable(String className, List expect) {
 
-        WebElement table = this.driver.findElement(By.className(className));
+        WebElement table = driver.findElement(By.className(className));
 
         List <WebElement>rows = table.findElements(By.tagName("tr"));
         int columnCount = ((SearchContext) rows.get(0)).findElements(By.xpath("./*")).size();
@@ -652,6 +858,7 @@ public class WebConnector {
 
 
 	public void sunday(String commandLocater) throws InterruptedException {
+		dt = new Date();
 		Date reserveDate;
 		String testReserveDate;
 		Calendar calendar = Calendar.getInstance();
@@ -699,6 +906,7 @@ public class WebConnector {
 	}
 
 	public void dateFromSet() {
+		dt = new Date();
 		String reserveFrom;
 		int reserveYear;
 		int reserveMonth;
@@ -713,6 +921,7 @@ public class WebConnector {
 	}
 
 	public void monday(String commandLocater) throws InterruptedException {
+		dt = new Date();
 		Date reserveDate;
 		String testReserveDate;
 		Calendar calendar = Calendar.getInstance();
@@ -760,6 +969,7 @@ public class WebConnector {
 	}
 
 	public void tuesday(String commandLocater) throws InterruptedException {
+		dt = new Date();
 		Date reserveDate;
 		String testReserveDate;
 		Calendar calendar = Calendar.getInstance();
@@ -807,6 +1017,7 @@ public class WebConnector {
 	}
 
 	public void wednesday(String commandLocater) throws InterruptedException {
+		dt = new Date();
 		Date reserveDate;
 		String testReserveDate;
 		Calendar calendar = Calendar.getInstance();
@@ -854,6 +1065,7 @@ public class WebConnector {
 	}
 
 	public void thursday(String commandLocater) throws InterruptedException {
+		dt = new Date();
 		Date reserveDate;
 		String testReserveDate;
 		Calendar calendar = Calendar.getInstance();
@@ -901,6 +1113,7 @@ public class WebConnector {
 	}
 
 	public void friday(String commandLocater) throws InterruptedException {
+		dt = new Date();
 		Date reserveDate;
 		String testReserveDate;
 		Calendar calendar = Calendar.getInstance();
@@ -948,6 +1161,7 @@ public class WebConnector {
 	}
 
 	public void saturday(String commandLocater) throws InterruptedException {
+		dt = new Date();
 		Date reserveDate;
 		String testReserveDate;
 		Calendar calendar = Calendar.getInstance();
@@ -995,6 +1209,7 @@ public class WebConnector {
 	}
 
 	public void termSet(int term) {
+		Date dt = new Date();
 		Date reserveEnd;
 		String reserveTo;
 		int reserveToYear;
@@ -1021,4 +1236,21 @@ public class WebConnector {
     	return res;
     }
 
+    public String getReserveUser(String commandLocater1, String commandLocater2) throws InterruptedException {
+		String contactText = null;
+
+		WebElement name = driver.findElement(By.id(commandLocater1));
+        wait.until(ExpectedConditions.visibilityOf(name));
+        username = name.getAttribute("value");
+
+		WebElement contact = driver.findElement(By.id(commandLocater2));
+        wait.until(ExpectedConditions.visibilityOf(contact));
+        Select select = new Select(contact);
+        List<WebElement> options = select.getAllSelectedOptions();
+        for(WebElement option: options) {
+        	contactText = option.getText();
+        }
+        Thread.sleep(500);
+		return contactText;
+    }
 }
