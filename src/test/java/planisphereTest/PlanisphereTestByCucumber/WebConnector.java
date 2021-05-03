@@ -906,7 +906,7 @@ public class WebConnector {
 	}
 
 	public void dateFromSet() {
-		dt = new Date();
+//		dt = new Date();
 		String reserveFrom;
 		int reserveYear;
 		int reserveMonth;
@@ -1209,7 +1209,7 @@ public class WebConnector {
 	}
 
 	public void termSet(int term) {
-		Date dt = new Date();
+//		Date dt = new Date();
 		Date reserveEnd;
 		String reserveTo;
 		int reserveToYear;
