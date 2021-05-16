@@ -22,6 +22,13 @@ public class StepDefinitions {
     private static String id;
     private static String passwd;
 
+/**
+ * 会員登録済みユーザーは、マイページから氏名と電話番号を確認できる
+ * ただし、電話番号は任意
+ */
+    private static String memberName;
+    private static String memberTel;
+    private static String memberMail;
 //    public void WebSteps(WebConnector connector) {
 //        this.connector = connector;
 //    }
@@ -270,6 +277,26 @@ public class StepDefinitions {
 //    public void css_buttonClickAndPopUp(String commandLocater) throws InterruptedException {
 //    	connector.cssButtonClickAndPopUp(commandLocater);
 //    }
+/**
+ * 画面から取得系
+ * @throws InterruptedException
+ */
+    @かつ("^メールアドレスと名前と電話番号を取得する$")
+    public void getMemberInfo() throws InterruptedException {
+      	String selector;
+
+      	selector = "username";
+       	memberName = connector.getString(selector);
+
+       	selector = "email";
+       	memberMail = connector.getString(selector);
+
+       	selector = "tel";
+       	memberTel = connector.getString(selector);
+       	if(memberTel.equals("未登録")) {
+       		memberTel = null;
+       	}
+    }
 
 
 /** 入力系 */
@@ -433,15 +460,25 @@ public class StepDefinitions {
     	String selector1 = "contact";
     	String selector2 = "tel";
     	String selector3 = "email";
+    	String existChr;
 
     	connector.dropDownSelect(selector1, contact);
     	contactType = contact;
     	Thread.sleep(1000);
-    	if(tel.length() != 0) {
-    		connector.inputAndWait(selector2, tel);
-    	}
-    	if(email.length() != 0) {
-    		connector.inputAndWait(selector3, email);
+    	switch(contact) {
+    	case("電話でのご連絡"):
+    		existChr = connector.getText(selector2);
+    		if((tel.length() != 0)&&(existChr.length() == 0)) {
+    			connector.inputAndWait(selector2, tel);
+    		}
+    		break;
+    	case("メールでのご連絡"):
+    		existChr = connector.getText(selector3);
+        	if((email.length() != 0)&&(existChr.length() == 0)) {
+        		connector.inputAndWait(selector3, email);
+        	}
+    		break;
+    	default:
     	}
     }
 
@@ -941,10 +978,16 @@ public class StepDefinitions {
     		assertTrue(connector.testText(selector, contactText));
     		break;
     	case("電話でのご連絡"):
+    		if(telText.length() == 0) {
+    			telText = connector.tel;
+    		}
     		contactText = "電話" + "：" + telText;
 			assertTrue(connector.testText(selector, contactText));
     		break;
     	case("メールでのご連絡"):
+    		if(emailText.length() == 0) {
+    			emailText = connector.email;
+    		}
     		contactText = "メール" + "：" + emailText;
 			assertTrue(connector.testText(selector, contactText));
     		break;
